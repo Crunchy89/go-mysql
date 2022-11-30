@@ -6,6 +6,7 @@ import (
 
 	_roleRoute "github.com/Crunchy89/go-mysql/app/role"
 	_userRoute "github.com/Crunchy89/go-mysql/app/user"
+	"github.com/Crunchy89/go-mysql/migration"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -52,7 +53,7 @@ func main() {
 	}
 
 	// comment for disable auto migration
-	// migration.Migrate(db)
+	migration.Migrate(db)
 
 	// initialize gin
 	server := gin.Default()

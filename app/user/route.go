@@ -19,7 +19,7 @@ func UserRoute(handler *gin.Engine, database *gorm.DB) {
 	v1 := handler.Group("api").Group("v1")
 	user := v1.Group("user")
 	user.GET("", userHttp.GetAll)
-	user.GET("/:id", userHttp.GetUserById)
+	user.GET("/:uuid", userHttp.GetUserByUUID)
 	user.POST("", userHttp.CreateUser)
 	user.PUT("", userHttp.UpdateUser)
 	user.DELETE("", userHttp.DeleteUser)

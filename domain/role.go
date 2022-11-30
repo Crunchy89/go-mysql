@@ -6,6 +6,6 @@ import (
 
 type Role struct {
 	gorm.Model
-	Role string `gorm:"size:50"`
+	Role string `gorm:"size:50;unique"`
 	UUID string `gorm:"size:255"`
 }

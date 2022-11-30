@@ -2,7 +2,6 @@ package http
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/Crunchy89/go-mysql/app/user/payload"
 	"github.com/Crunchy89/go-mysql/app/user/service"
@@ -19,13 +18,12 @@ func (h *UserHandler) GetAll(c *gin.Context) {
 	res, err := h.User.GetAll()
 	s.Auto(c, res, err)
 }
-func (h *UserHandler) GetUserById(c *gin.Context) {
-	_id := c.Param("id")
-	id, err := strconv.Atoi(_id)
-	if err != nil {
-		c.AbortWithError(422, errors.New("id not valid"))
+func (h *UserHandler) GetUserByUUID(c *gin.Context) {
+	uuid := c.Param("uuid")
+	if uuid == "" {
+		c.AbortWithError(422, errors.New("uuid can't be empty"))
 	}
-	res, err := h.User.GetById(id)
+	res, err := h.User.GetByUUID(uuid)
 	s.Auto(c, res, err)
 }
 func (h *UserHandler) CreateUser(c *gin.Context) {

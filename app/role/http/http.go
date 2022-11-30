@@ -2,7 +2,6 @@ package http
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/Crunchy89/go-mysql/app/role/payload"
 	"github.com/Crunchy89/go-mysql/app/role/service"
@@ -19,13 +18,12 @@ func (h *RoleHandler) GetAll(c *gin.Context) {
 	res, err := h.Role.GetAll()
 	s.Auto(c, res, err)
 }
-func (h *RoleHandler) GetRoleById(c *gin.Context) {
-	_id := c.Param("id")
-	id, err := strconv.Atoi(_id)
-	if err != nil {
-		c.AbortWithError(422, errors.New("id not valid"))
+func (h *RoleHandler) GetRoleByUUID(c *gin.Context) {
+	uuid := c.Param("uuid")
+	if uuid != "" {
+		c.AbortWithError(422, errors.New("uuid can't be empty"))
 	}
-	res, err := h.Role.GetById(id)
+	res, err := h.Role.GetByUUID(uuid)
 	s.Auto(c, res, err)
 }
 func (h *RoleHandler) CreateRole(c *gin.Context) {

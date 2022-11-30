@@ -6,7 +6,7 @@ import (
 
 type User struct {
 	gorm.Model
-	Username string `gorm:"size:50"`
+	Username string `gorm:"size:50;unique"`
 	Password string `gorm:"size:255"`
 	UUID     string `gorm:"size:255"`
 	// define foreign key on update cascade on delete cascade

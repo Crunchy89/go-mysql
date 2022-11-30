@@ -12,7 +12,7 @@ import (
 )
 
 type RoleService interface {
-	GetById(id int) (*payload.RoleResponse, r.Ex)
+	GetByUUID(uuid string) (*payload.RoleResponse, r.Ex)
 	GetAll() ([]*payload.RoleResponse, r.Ex)
 	CreateRole(role *payload.RoleCreate) (string, r.Ex)
 	UpdateRole(role *payload.RoleUpdate) (string, r.Ex)
@@ -26,15 +26,13 @@ type baseRoleService struct {
 func NewRoleService(role repository.RoleRepository) RoleService {
 	return &baseRoleService{role: role}
 }
-
-func (b *baseRoleService) GetById(id int) (*payload.RoleResponse, r.Ex) {
-	res, err := b.role.GetByID(id)
+func (b *baseRoleService) GetByUUID(uuid string) (*payload.RoleResponse, r.Ex) {
+	res, err := b.role.GetByUUID(uuid)
 	if err != nil {
 		return nil, err
 	}
 	response := response.SingleResponse(res)
 	return response, nil
-
 }
 func (b *baseRoleService) GetAll() ([]*payload.RoleResponse, r.Ex) {
 	res, err := b.role.GetAll()
@@ -57,14 +55,18 @@ func (b *baseRoleService) CreateRole(role *payload.RoleCreate) (string, r.Ex) {
 	return "data created", nil
 }
 func (b *baseRoleService) UpdateRole(role *payload.RoleUpdate) (string, r.Ex) {
-	newRole := &domain.Role{}
-	newRole.ID = role.ID
-	newRole.Role = role.Role
-	newRole.UpdatedAt = time.Now().UTC()
-	return b.role.UpdateRole(newRole)
+	current, err := b.role.GetByUUID(role.UUID)
+	if err != nil {
+		return "", err
+	}
+	current.Role = role.Role
+	current.UpdatedAt = time.Now().UTC()
+	return b.role.UpdateRole(current)
 }
 func (b *baseRoleService) DeleteRole(role *payload.RoleDelete) (string, r.Ex) {
-	newRole := &domain.Role{}
-	newRole.ID = role.ID
-	return b.role.DeleteRole(newRole)
+	current, err := b.role.GetByUUID(role.UUID)
+	if err != nil {
+		return "", err
+	}
+	return b.role.DeleteRole(current)
 }

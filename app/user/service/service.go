@@ -12,7 +12,7 @@ import (
 )
 
 type UserService interface {
-	GetById(id int) (*payload.UserResponse, r.Ex)
+	GetByUUID(uuid string) (*payload.UserResponse, r.Ex)
 	GetAll() ([]*payload.UserResponse, r.Ex)
 	CreateUser(user *payload.UserCreate) (string, r.Ex)
 	UpdateUser(user *payload.UserUpdate) (string, r.Ex)
@@ -27,8 +27,8 @@ func NewUserService(user repository.UserRepository) UserService {
 	return &baseUserService{user: user}
 }
 
-func (b *baseUserService) GetById(id int) (*payload.UserResponse, r.Ex) {
-	res, err := b.user.GetByID(id)
+func (b *baseUserService) GetByUUID(uuid string) (*payload.UserResponse, r.Ex) {
+	res, err := b.user.GetByUUID(uuid)
 	response := response.SingleResponse(res)
 	return response, err
 }
@@ -52,19 +52,23 @@ func (b *baseUserService) CreateUser(user *payload.UserCreate) (string, r.Ex) {
 	return "data created", nil
 }
 func (b *baseUserService) UpdateUser(user *payload.UserUpdate) (string, r.Ex) {
-	newUser := &domain.User{}
-	newUser.ID = user.ID
+	current, err := b.user.GetByUUID(user.UUID)
+	if err != nil {
+		return "", err
+	}
 	if user.Password != nil {
-		newUser.Password = *user.Password
+		current.Password = *user.Password
 	}
 	if user.RoleID != nil {
-		newUser.RoleID = *user.RoleID
+		current.RoleID = *user.RoleID
 	}
-	newUser.UpdatedAt = time.Now().UTC()
-	return b.user.UpdateUser(newUser)
+	current.UpdatedAt = time.Now().UTC()
+	return b.user.UpdateUser(current)
 }
 func (b *baseUserService) DeleteUser(user *payload.UserDelete) (string, r.Ex) {
-	newUser := &domain.User{}
-	newUser.ID = user.ID
-	return b.user.DeleteUser(newUser)
+	current, err := b.user.GetByUUID(user.UUID)
+	if err != nil {
+		return "", err
+	}
+	return b.user.DeleteUser(current)
 }

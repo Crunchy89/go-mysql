@@ -5,10 +5,10 @@ type (
 		Role string `json:"role" binding:"required"`
 	}
 	RoleUpdate struct {
-		ID   uint   `json:"id" binding:"required"`
+		UUID string `json:"uuid" binding:"required"`
 		Role string `json:"role" binding:"required"`
 	}
 	RoleDelete struct {
-		ID uint `json:"id" binding:"required"`
+		UUID string `json:"uuid" binding:"required"`
 	}
 )

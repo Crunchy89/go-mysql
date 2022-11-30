@@ -9,7 +9,7 @@ import (
 
 type UserRepository interface {
 	GetAll() ([]*domain.User, r.Ex)
-	GetByID(id int) (*domain.User, r.Ex)
+	GetByUUID(uuid string) (*domain.User, r.Ex)
 	CreateUser(user *domain.User) (*uint, r.Ex)
 	UpdateUser(user *domain.User) (string, r.Ex)
 	DeleteUser(user *domain.User) (string, r.Ex)
@@ -25,36 +25,35 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 
 func (b *baseUserRepository) GetAll() ([]*domain.User, r.Ex) {
 	user := []*domain.User{}
-	result := b.db.First(&user)
+	result := b.db.Find(&user)
 	if result.RowsAffected > 0 {
 		return user, nil
 	}
 	return nil, r.NewErr(result.Error.Error())
 
 }
-func (b *baseUserRepository) GetByID(id int) (*domain.User, r.Ex) {
+func (b *baseUserRepository) GetByUUID(uuid string) (*domain.User, r.Ex) {
 	user := &domain.User{}
-	result := b.db.First(&user, id)
+	result := b.db.First(&user, "uuid = ?", uuid)
 	if result.RowsAffected > 0 {
 		return user, nil
 	}
 	return nil, r.NewErr(result.Error.Error())
-
 }
 func (b *baseUserRepository) CreateUser(user *domain.User) (*uint, r.Ex) {
 	result := b.db.Create(user)
 	if result.RowsAffected > 0 {
 		return &user.ID, nil
 	}
-	return nil, r.NewErrorDatabase(result.Error)
+	return nil, r.NewErr(result.Error.Error())
 
 }
 func (b *baseUserRepository) UpdateUser(user *domain.User) (string, r.Ex) {
-	result := b.db.First(&user).Save(user)
+	result := b.db.Model(&user).UpdateColumns(domain.User{RoleID: user.RoleID, Password: user.Password})
 	if result.RowsAffected > 0 {
 		return "data update successfully", nil
 	}
-	return "", r.NewErrorDatabase(result.Error)
+	return "", r.NewErr(result.Error.Error())
 
 }
 func (b *baseUserRepository) DeleteUser(user *domain.User) (string, r.Ex) {
@@ -62,6 +61,6 @@ func (b *baseUserRepository) DeleteUser(user *domain.User) (string, r.Ex) {
 	if result.RowsAffected > 0 {
 		return "data deleted", nil
 	}
-	return "", r.NewErrorDatabase(result.Error)
+	return "", r.NewErr(result.Error.Error())
 
 }
