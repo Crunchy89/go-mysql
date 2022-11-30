@@ -8,7 +8,6 @@ import (
 	"github.com/Crunchy89/go-mysql/app/role/response"
 	"github.com/Crunchy89/go-mysql/domain"
 	"github.com/Crunchy89/go-mysql/utils/r"
-	"github.com/google/uuid"
 )
 
 type RoleService interface {
@@ -43,10 +42,8 @@ func (b *baseRoleService) GetAll() ([]*payload.RoleResponse, r.Ex) {
 	return response, nil
 }
 func (b *baseRoleService) CreateRole(role *payload.RoleCreate) (string, r.Ex) {
-	UUID := uuid.New().String()
 	newRole := &domain.Role{
 		Role: role.Role,
-		UUID: UUID,
 	}
 	_, err := b.role.CreateRole(newRole)
 	if err != nil {

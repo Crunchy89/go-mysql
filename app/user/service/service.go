@@ -8,7 +8,6 @@ import (
 	"github.com/Crunchy89/go-mysql/app/user/response"
 	"github.com/Crunchy89/go-mysql/domain"
 	"github.com/Crunchy89/go-mysql/utils/r"
-	"github.com/google/uuid"
 )
 
 type UserService interface {
@@ -38,11 +37,9 @@ func (b *baseUserService) GetAll() ([]*payload.UserResponse, r.Ex) {
 	return response, err
 }
 func (b *baseUserService) CreateUser(user *payload.UserCreate) (string, r.Ex) {
-	UUID := uuid.New().String()
 	newUser := &domain.User{
 		Username: user.Username,
 		Password: user.Password,
-		UUID:     UUID,
 		RoleID:   user.RoleID,
 	}
 	_, err := b.user.CreateUser(newUser)
