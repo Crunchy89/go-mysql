@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	_roleRoute "github.com/Crunchy89/go-mysql/app/role"
 	_userRoute "github.com/Crunchy89/go-mysql/app/user"
 
 	"github.com/gin-contrib/cors"
@@ -24,6 +25,8 @@ func main() {
 	}
 	println("env loaded")
 	gin.SetMode(gin.ReleaseMode)
+
+	// initialize the database
 	var db *gorm.DB
 	if os.Getenv("DB_DRIVER") == "pgsql" {
 		var url string = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
@@ -44,11 +47,14 @@ func main() {
 		)
 		db, err = gorm.Open(mysql.Open(url), &gorm.Config{})
 	}
-
 	if err != nil {
 		panic(err.Error())
 	}
 
+	// comment for disable auto migration
+	// migration.Migrate(db)
+
+	// initialize gin
 	server := gin.Default()
 	server.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
@@ -57,8 +63,11 @@ func main() {
 		AllowHeaders:     []string{"*"},
 	}))
 
+	// register route in app
 	_userRoute.UserRoute(server, db)
+	_roleRoute.RoleRoute(server, db)
 
+	// running the application
 	port := ":" + os.Getenv("PORT")
 	if port == ":" || port == "" {
 		port = ":" + "8080"
