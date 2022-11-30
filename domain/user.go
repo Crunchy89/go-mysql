@@ -21,3 +21,7 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	u.Password = password.HashPassword(u.Password)
 	return
 }
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	u.Password = password.HashPassword(u.Password)
+	return
+}
